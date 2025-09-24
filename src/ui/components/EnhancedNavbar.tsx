@@ -117,7 +117,7 @@ const EnhancedNavbar = React.forwardRef<HTMLElement, EnhancedNavbarProps>(
               <Wallet size={16} className="text-white" />
             </div>
             <span className="font-['Montserrat'] text-[20px] font-[800] text-brand-900">
-              Gemetra
+              Revatix
             </span>
           </div>
 
@@ -220,7 +220,7 @@ const MobileNavbar: React.FC<MobileNavbarProps> = ({
                 <Wallet size={20} className="text-white" />
               </div>
               <span className="font-['Montserrat'] text-[24px] font-[800] text-brand-900">
-                Gemetra
+                Revatix
               </span>
             </div>
             

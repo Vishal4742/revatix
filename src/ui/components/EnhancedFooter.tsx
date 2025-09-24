@@ -36,11 +36,11 @@ const EnhancedFooter = React.forwardRef<HTMLElement, EnhancedFooterProps>(
                 <div className="w-10 h-10 rounded-full bg-brand-700 flex items-center justify-center">
                   <Wallet size={20} className="text-white" />
                 </div>
-                <span className="font-['Montserrat'] text-[24px] font-[800] text-white">Gemetra</span>
+                <span className="font-['Montserrat'] text-[24px] font-[800] text-white">Revatix</span>
               </div>
               
               <p className="text-white/70 mb-6 text-sm">
-                Borderless payments infrastructure built on SOMNIA blockchain unifying VAT refunds and global payroll automation with AI-driven financial intelligence.
+                Borderless payments infrastructure built on Yellow Network unifying VAT refunds and global payroll automation with AI-driven financial intelligence.
               </p>
               
               <div className="flex items-center gap-4 mb-8">
@@ -135,7 +135,7 @@ const EnhancedFooter = React.forwardRef<HTMLElement, EnhancedFooterProps>(
           {/* Bottom Section */}
           <div className="mt-16 pt-8 border-t border-neutral-800 flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex flex-col md:flex-row items-center gap-6">
-              <span className="text-white/60 text-sm">© Gemetra {new Date().getFullYear()}</span>
+              <span className="text-white/60 text-sm">© Revatix {new Date().getFullYear()}</span>
               <div className="flex gap-6">
                 <LinkButton className="text-white/60 hover:text-white text-sm">Privacy Policy</LinkButton>
                 <LinkButton className="text-white/60 hover:text-white text-sm">Terms of Service</LinkButton>
