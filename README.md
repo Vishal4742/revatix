@@ -305,6 +305,7 @@ npm run setup:testnet
 - **Yellow Network Faucet**: https://faucet.yellow.org/
 - **Yellow Network Explorer**: https://explorer.yellow.org/
 - **Testnet Setup Guide**: See `TESTNET_SETUP.md` for detailed instructions
+- **Troubleshooting Guide**: See `YELLOW_NETWORK_TROUBLESHOOTING.md` for common issues and solutions
 
 ### Testing Checklist
 
@@ -367,7 +368,8 @@ revatix/
 │   └── setup-testnet.js
 ├── TESTNET_SETUP.md        # Testnet setup guide
 ├── ENVIRONMENT_SETUP.md    # Environment setup guide
-└── CEREBRO_IMPLEMENTATION.md # Cerebro implementation docs
+├── CEREBRO_IMPLEMENTATION.md # Cerebro implementation docs
+└── YELLOW_NETWORK_TROUBLESHOOTING.md # Troubleshooting guide
 ```
 
 ## 🚀 Available Scripts
