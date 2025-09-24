@@ -2,6 +2,9 @@ import { NitroliteClient } from '@erc7824/nitrolite';
 import { createPublicClient, createWalletClient, http, webSocket } from 'viem';
 import { mainnet, polygon, base, celo } from 'viem/chains';
 import { ENV_CONFIG } from '../config/environment';
+import { walletManager } from './walletManager';
+import { faucetManager } from './faucetManager';
+import { handleYellowNetworkError, logYellowNetworkError, isErrorRecoverable } from './errorHandler';
 
 // Yellow Network configuration based on official documentation
 export const YELLOW_NETWORK_CONFIG = {
@@ -72,8 +75,13 @@ try {
     walletClient: walletClient,
     chain: YELLOW_NETWORK_CONFIG.defaultChain,
   });
+
+  // Initialize enhanced managers
+  walletManager.initialize(nitroliteClient);
+  
+  console.log('✅ Enhanced Yellow Network client initialized with improved error handling');
 } catch (error) {
-  console.warn('Failed to initialize Nitrolite client:', error);
+  logYellowNetworkError(error as Error, { operation: 'client_initialization' });
   console.warn('Some features may not work properly. Please check your environment configuration.');
 }
 
@@ -719,4 +727,233 @@ export const switchChain = async (chainId: number): Promise<boolean> => {
 // Get current chain
 export const getCurrentChain = () => {
   return currentChain;
+};
+
+// Enhanced functions based on community insights
+
+// Request test tokens with improved error handling
+export const requestTestTokensEnhanced = async (address: string): Promise<{ success: boolean; error?: string; message?: string }> => {
+  try {
+    const result = await faucetManager.requestTestTokens({ userAddress: address });
+    
+    if (result.success) {
+      return {
+        success: true,
+        message: 'Test tokens requested successfully. They will appear in your off-chain unified balance on Clearnode.'
+      };
+    } else {
+      return {
+        success: false,
+        error: result.error || 'Failed to request test tokens'
+      };
+    }
+  } catch (error) {
+    logYellowNetworkError(error as Error, { operation: 'faucet_request', address });
+    return {
+      success: false,
+      error: handleYellowNetworkError(error as Error, { operation: 'faucet_request', address }).userMessage
+    };
+  }
+};
+
+// Get comprehensive balance information (on-chain + off-chain)
+export const getComprehensiveBalance = async (address: string): Promise<{
+  success: boolean;
+  balance?: any;
+  error?: string;
+}> => {
+  try {
+    const balanceInfo = await faucetManager.getBalanceInfo(address);
+    return {
+      success: true,
+      balance: balanceInfo
+    };
+  } catch (error) {
+    logYellowNetworkError(error as Error, { operation: 'balance_check', address });
+    return {
+      success: false,
+      error: handleYellowNetworkError(error as Error, { operation: 'balance_check', address }).userMessage
+    };
+  }
+};
+
+// Connect wallet with session key support
+export const connectWalletEnhanced = async (address: string, useSessionKey: boolean = true): Promise<{ success: boolean; error?: string }> => {
+  try {
+    if (useSessionKey) {
+      // Create session and connect
+      const sessionResult = await walletManager.createWalletSession(address);
+      if (!sessionResult.success) {
+        throw new Error(sessionResult.error || 'Failed to create session');
+      }
+
+      const connectResult = await walletManager.connectWalletWithSession(address, sessionResult.sessionKey!);
+      if (connectResult.success) {
+        connectedAccount = address;
+        return { success: true };
+      } else {
+        throw new Error(connectResult.error || 'Failed to connect with session');
+      }
+    } else {
+      // Use traditional connection (for backend)
+      const connectResult = await walletManager.connectWalletWithPrivateKey(address, '');
+      if (connectResult.success) {
+        connectedAccount = address;
+        return { success: true };
+      } else {
+        throw new Error(connectResult.error || 'Failed to connect with private key');
+      }
+    }
+  } catch (error) {
+    logYellowNetworkError(error as Error, { operation: 'wallet_connection', address });
+    return {
+      success: false,
+      error: handleYellowNetworkError(error as Error, { operation: 'wallet_connection', address }).userMessage
+    };
+  }
+};
+
+// Disconnect wallet with cleanup
+export const disconnectWalletEnhanced = async (): Promise<{ success: boolean; error?: string }> => {
+  try {
+    if (connectedAccount) {
+      const result = await walletManager.disconnectWallet(connectedAccount);
+      connectedAccount = null;
+      return result;
+    }
+    return { success: true };
+  } catch (error) {
+    logYellowNetworkError(error as Error, { operation: 'wallet_disconnection' });
+    return {
+      success: false,
+      error: handleYellowNetworkError(error as Error, { operation: 'wallet_disconnection' }).userMessage
+    };
+  }
+};
+
+// Open Clearnode channel for off-chain balance access
+export const openClearnodeChannel = async (address: string): Promise<{ success: boolean; channelId?: string; error?: string }> => {
+  try {
+    const result = await faucetManager.openClearnodeChannel(address);
+    return result;
+  } catch (error) {
+    logYellowNetworkError(error as Error, { operation: 'channel_creation', address });
+    return {
+      success: false,
+      error: handleYellowNetworkError(error as Error, { operation: 'channel_creation', address }).userMessage
+    };
+  }
+};
+
+// Withdraw from off-chain balance
+export const withdrawFromOffChain = async (address: string, amount: number): Promise<{ success: boolean; txHash?: string; error?: string }> => {
+  try {
+    const result = await faucetManager.withdrawFromOffChain(address, amount);
+    return result;
+  } catch (error) {
+    logYellowNetworkError(error as Error, { operation: 'withdrawal', address, amount });
+    return {
+      success: false,
+      error: handleYellowNetworkError(error as Error, { operation: 'withdrawal', address, amount }).userMessage
+    };
+  }
+};
+
+// Complete setup: request tokens + open channel
+export const setupYellowNetworkAccess = async (address: string): Promise<{ success: boolean; error?: string; message?: string }> => {
+  try {
+    const result = await faucetManager.requestTokensAndOpenChannel(address);
+    
+    if (result.success) {
+      return {
+        success: true,
+        message: 'Yellow Network access setup complete! You can now use off-chain balances and create state channels.'
+      };
+    } else {
+      return {
+        success: false,
+        error: result.error || 'Failed to setup Yellow Network access'
+      };
+    }
+  } catch (error) {
+    logYellowNetworkError(error as Error, { operation: 'network_setup', address });
+    return {
+      success: false,
+      error: handleYellowNetworkError(error as Error, { operation: 'network_setup', address }).userMessage
+    };
+  }
+};
+
+// Enhanced channel creation with better error handling
+export const createPaymentChannelEnhanced = async (
+  recipient: string,
+  amount: number,
+  token: string = 'USDC'
+): Promise<{ channelId: string; success: boolean; error?: string }> => {
+  try {
+    if (!connectedAccount) {
+      throw new Error('Wallet not connected');
+    }
+
+    if (!isValidAddress(recipient)) {
+      throw new Error('Invalid recipient address');
+    }
+
+    if (!nitroliteClient) {
+      throw new Error('Nitrolite client not initialized');
+    }
+
+    // Check if we have sufficient balance (both on-chain and off-chain)
+    const balanceInfo = await faucetManager.getBalanceInfo(connectedAccount);
+    const totalAvailable = balanceInfo.onChain.tokens.reduce((sum, t) => sum + t.amount, 0) + balanceInfo.offChain.available;
+    
+    if (totalAvailable < amount) {
+      throw new Error('Insufficient balance. Consider requesting test tokens or withdrawing from off-chain balance.');
+    }
+
+    // Create channel with enhanced error handling
+    const channel = await nitroliteClient.createChannel({
+      participants: [connectedAccount, recipient],
+      initialAllocation: {
+        [connectedAccount]: amount * 0.5,
+        [recipient]: amount * 0.5
+      },
+      token: token,
+      challengePeriod: 86400,
+      adjudicator: '0x0000000000000000000000000000000000000000',
+    });
+
+    console.log('✅ Enhanced state channel created:', channel.id);
+    return {
+      channelId: channel.id,
+      success: true
+    };
+  } catch (error) {
+    logYellowNetworkError(error as Error, { operation: 'channel_creation', address: connectedAccount, amount });
+    return {
+      channelId: '',
+      success: false,
+      error: handleYellowNetworkError(error as Error, { operation: 'channel_creation', address: connectedAccount, amount }).userMessage
+    };
+  }
+};
+
+// Get connection status
+export const getConnectionStatus = (): {
+  walletConnected: boolean;
+  clearnodeConnected: boolean;
+  channelOpen: boolean;
+  offChainBalance: number;
+  sessionActive: boolean;
+} => {
+  const clearnodeStatus = faucetManager.getConnectionStatus();
+  const sessionInfo = connectedAccount ? walletManager.getSessionInfo(connectedAccount) : null;
+
+  return {
+    walletConnected: !!connectedAccount,
+    clearnodeConnected: clearnodeStatus.connected,
+    channelOpen: clearnodeStatus.channelOpen,
+    offChainBalance: clearnodeStatus.offChainBalance,
+    sessionActive: sessionInfo?.isActive || false
+  };
 };
