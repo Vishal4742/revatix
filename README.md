@@ -237,7 +237,7 @@ sequenceDiagram
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/your-username/revatix.git
+git clone https://github.com/Vishal4742/revatix.git
 cd revatix
 ```
 
@@ -542,7 +542,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 - **Documentation**: Check our [docs](https://docs.revatix.com) (coming soon)
-- **Issues**: Report bugs and request features on [GitHub Issues](https://github.com/your-username/revatix/issues)
+- **Issues**: Report bugs and request features on [GitHub Issues](https://github.com/Vishal4742/revatix/issues)
 - **Discord**: Join our community on [Discord](https://discord.gg/revatix) (coming soon)
 - **Twitter**: Follow us on [@RevatixApp](https://twitter.com/RevatixApp) (coming soon)
 
